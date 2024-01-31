@@ -14,6 +14,7 @@ pub enum PieceKind {
     Rook,
     Queen,
     King,
+    All,
 }
 impl PieceKind {
     // allows us to use numbers as the piece names which is nice
@@ -25,114 +26,88 @@ impl PieceKind {
             PieceKind::Rook => 3,
             PieceKind::Queen => 4,
             PieceKind::King => 5,
+            PieceKind::All => 6,
         }
     }
 }
-pub struct Bitboard {
-    pub bit: u64,
-    pub color: bool,
-    pub kind: PieceKind,
+pub const fn pawn(color: bool) -> u64 {
+    return if color {PAWN_INITIAL} else {PAWN_INITIAL<<40};
 }
-impl Bitboard {
+pub const fn knight(color: bool) -> u64 {
+    return if color {KNIGHT_INITIAL} else {KNIGHT_INITIAL<<56};
+}
+pub const fn bishop(color: bool) -> u64 {
+    return if color {BISHOP_INITIAL} else {BISHOP_INITIAL<<56}; 
+}
+pub const fn rook(color: bool) -> u64 {
+    return if color {ROOK_INITIAL} else {ROOK_INITIAL<<56};
+}
+pub const fn queen(color: bool) -> u64 {
+    return if color {QUEEN_INITIAL} else {QUEEN_INITIAL<<56};
+}
+pub const fn king(color: bool) -> u64 {
+    return if color {KING_INITIAL} else {KING_INITIAL<<56};
+}
+pub const fn all(color: bool) -> u64 {
+    return if color {KING_INITIAL ^ QUEEN_INITIAL ^ ROOK_INITIAL ^ BISHOP_INITIAL ^ KNIGHT_INITIAL ^ PAWN_INITIAL } 
+        else {(KING_INITIAL ^ QUEEN_INITIAL ^ ROOK_INITIAL ^ BISHOP_INITIAL ^ KNIGHT_INITIAL)<<56 ^PAWN_INITIAL<<40};
+}
 
-    pub const fn pawn(color: bool) -> Self {
-        Self { bit: if color {PAWN_INITIAL} else {PAWN_INITIAL<<40}, color, kind: PieceKind::Pawn}
-    }
-    pub const fn knight(color: bool) -> Self {
-        Self { bit: if color {KNIGHT_INITIAL} else {KNIGHT_INITIAL<<56}, color, kind: PieceKind::Knight}
-    }
-    pub const fn bishop(color: bool) -> Self {
-        Self { bit: if color {BISHOP_INITIAL} else {BISHOP_INITIAL<<56}, color, kind: PieceKind::Bishop}
-    }
-    pub const fn rook(color: bool) -> Self {
-        Self { bit: if color {ROOK_INITIAL} else {ROOK_INITIAL<<56}, color, kind: PieceKind::Rook}
-    }
-    pub const fn queen(color: bool) -> Self {
-        Self { bit: if color {QUEEN_INITIAL} else {QUEEN_INITIAL<<56}, color, kind: PieceKind::Queen}
-    }
-    pub const fn king(color: bool) -> Self {
-        Self { bit: if color {KING_INITIAL} else {KING_INITIAL<<56}, color, kind: PieceKind::King}
-    }
-    pub const fn all(color: bool) -> Self {
-        Self { bit: if color {KING_INITIAL ^ QUEEN_INITIAL ^ ROOK_INITIAL ^ BISHOP_INITIAL ^ KNIGHT_INITIAL ^ PAWN_INITIAL } 
-            else {(KING_INITIAL ^ QUEEN_INITIAL ^ ROOK_INITIAL ^ BISHOP_INITIAL ^ KNIGHT_INITIAL)<<56 ^PAWN_INITIAL<<40},
-            color, kind: PieceKind::King}
-    }
-}
 
 pub struct Boardstate {
-    pub white_king: Bitboard,
-    pub black_king: Bitboard,
-
-    pub white_queen: Bitboard,
-    pub black_queen: Bitboard,
-
-    pub white_rooks: Bitboard,
-    pub black_rooks: Bitboard,
-
-    pub white_bishops: Bitboard,
-    pub black_bishops: Bitboard,
-
-    pub white_knights: Bitboard,
-    pub black_knights: Bitboard,
-
-    pub white_pawns: Bitboard,
-    pub black_pawns: Bitboard,
-
-    pub white_pieces: Bitboard,
-    pub black_pieces: Bitboard,
-
-    pub white_castling_allowed: bool,
+    pub white: [u64; 7],
+    pub black: [u64; 7],
+    
+    pub white_castling_allowed: bool, 
     pub black_castling_allowed: bool,
 
     pub ply_count: i32,
-    pub white_to_play: bool,
-    pub checkmate: bool
+    pub checkmate: bool,
+    pub draw: bool,
 }
 impl Boardstate {
     pub fn setup() -> Self {
         
         Self {  
-            white_king: Bitboard::king(true), 
-            black_king: Bitboard::king(false),
+            white: [pawn(true), 
+                    knight(true), 
+                    bishop(true), 
+                    rook(true), 
+                    queen(true), 
+                    king(true),
+                    all(true)],
 
-            white_queen: Bitboard::queen(true),
-            black_queen: Bitboard::queen(false),
+            black: [pawn(false), 
+                    knight(false), 
+                    bishop(false), 
+                    rook(false), 
+                    queen(false), 
+                    king(false),
+                    all(false)],
 
-            white_rooks: Bitboard::rook(true),
-            black_rooks: Bitboard::rook(false),
-
-            white_bishops: Bitboard::bishop(true), 
-            black_bishops: Bitboard::bishop(false),
-
-            white_knights: Bitboard::knight(true), 
-            black_knights: Bitboard::knight(false),
-
-            white_pawns: Bitboard::pawn(true), 
-            black_pawns: Bitboard::pawn(false),
-
-            white_pieces:  Bitboard::all(true),
-            black_pieces: Bitboard::all(false),
 
             white_castling_allowed: true, 
             black_castling_allowed: true,
 
             ply_count: 0,
-            white_to_play: true,
             checkmate: false,
+            draw: false,
             }
     }
-    pub fn update(mut self, target_board: Bitboard) -> Self {
-        match target_board.kind.index() {
-            0 => if target_board.color {self.white_pawns.bit ^= target_board.bit;} else {self.black_pawns.bit ^= target_board.bit;}
-            1 => if target_board.color {self.white_knights.bit ^= target_board.bit;} else {self.black_knights.bit ^= target_board.bit;}
-            2 => if target_board.color {self.white_bishops.bit ^= target_board.bit;} else {self.black_bishops.bit ^= target_board.bit;}
-            3 => if target_board.color {self.white_rooks.bit ^= target_board.bit;} else {self.black_rooks.bit ^= target_board.bit;}
-            4 => if target_board.color {self.white_queen.bit ^= target_board.bit;} else {self.black_queen.bit ^= target_board.bit;}
-            5 => if target_board.color {self.white_king.bit ^= target_board.bit;} else {self.black_king.bit ^= target_board.bit;}
-            _ => println!("how?")
+    pub fn update(&mut self, new_move: u64, color: bool, kind: PieceKind, double_move: bool) -> &mut Self {
+        if self.ply_count > 10 {
+            self.draw = true;
+        }
+        if !double_move {
+            match color {
+                true => self.white[kind.index()] ^= new_move,
+                false => self.black[kind.index()] ^= new_move
+            }
         }
         self.ply_count += 1;
         return self;
+    }
+    pub fn ending(&self) -> bool{
+        return self.draw | self.checkmate;
     }
 }

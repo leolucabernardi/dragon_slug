@@ -30,16 +30,16 @@ pub fn game(board: &mut Boardstate, turn: &Turnstyle) {
     match turn {
         White => {
             let (next_move, kind) = get_next_move(true, board);
-            board.update(next_move, true, kind, false);
-            let turn: Turnstyle = if board.ending() {turn.next(End)} else {turn.next(Move)};
-            pretty_print(board.white[PieceKind::All.index()]);
+           board.update(next_move, true, kind, false);
+           let turn: Turnstyle = if board.ending() {turn.next(End)} else {turn.next(Move)};
+            pretty_print(board.white[PieceKind::Pawn.index()]);
             game(board, &turn);
         }
         Black => {
             let (next_move, kind) = get_next_move(false, board);
-            board.update(next_move, false, kind, false);
-            let turn: Turnstyle = if board.ending() {turn.next(End)} else {turn.next(Move)}; 
-            pretty_print(board.white[PieceKind::All.index()]);
+           board.update(next_move, true, kind, false);
+           let turn: Turnstyle = if board.ending() {turn.next(End)} else {turn.next(Move)}; 
+            pretty_print(board.white[PieceKind::Pawn.index()]);
             game(board, &turn);
         }
         Ending =>{
@@ -49,7 +49,7 @@ pub fn game(board: &mut Boardstate, turn: &Turnstyle) {
 }
 
 fn get_next_move(color: bool, board: &mut Boardstate) -> (u64, PieceKind) {
-    let next_move:u64  = 0b10000000010000000000;
+    let next_move:u64  = 0b1000000010000000000;
     let kind:PieceKind = PieceKind::Pawn;
     return (next_move, kind);
 } 

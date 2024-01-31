@@ -53,7 +53,7 @@ pub const fn all(color: bool) -> u64 {
         else {(KING_INITIAL ^ QUEEN_INITIAL ^ ROOK_INITIAL ^ BISHOP_INITIAL ^ KNIGHT_INITIAL)<<56 ^PAWN_INITIAL<<40};
 }
 
-
+# [derive(Debug)]
 pub struct Boardstate {
     pub white: [u64; 7],
     pub black: [u64; 7],

@@ -1,7 +1,7 @@
 
 # rust cargo stuff 
-/target
-/debug
+target/
+debug/
 
 # godot stuff
 .godot/

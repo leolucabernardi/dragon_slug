@@ -9,7 +9,7 @@ This project is currently in development. As the name suggests, right now the go
 
 Thank you for checking out Dragon Slug! 
 
-Also have a look at the [animal](https://de.wikipedia.org/wiki/Glaucus_atlanticus) this project was named after while you are already browsing random reposiories on GitHub :)
+Also have a look at the [animal](https://en.wikipedia.org/wiki/Glaucus_atlanticus) this project was named after, while you are already browsing random repositories on GitHub :)
 
 ## Features
 As I am working on this while attending university, updates and improvements are sporadic at best.

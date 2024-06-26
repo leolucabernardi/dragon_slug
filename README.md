@@ -1,6 +1,6 @@
 # Dragon Slug Chess Engine
 
-This project is currently in development. As the name suggests, right now the goal is not for it to be very fast, but rather for me to learn how to use rust trying to get it to run, or rather slither.
+This project is currently in development. As the name suggests, right now the goal is not for it to be very fast, but rather for me to learn how to use rust trying to get it to run/slither.
 
 
 - Nothing works at the moment :)
